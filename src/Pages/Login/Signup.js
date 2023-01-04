@@ -1,45 +1,78 @@
-import { data } from 'autoprefixer'
-import React from 'react'
-import { useContext } from 'react'
-import { toast } from 'react-hot-toast'
-
-import { Link } from 'react-router-dom'
+import React, { useContext } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import PrimaryButton from '../../Components/Button/PrimaryButton'
+import toast from 'react-hot-toast'
+import SmallSpinner from '../../Components/Spinner/SmallSpinner'
+import { setAuthToken } from '../../api/auth'
 import { AuthContext } from '../../Components/contexts/AuthProvider'
 
 const Signup = () => {
-  const { createUser, updateUserProfile, loading, setLoading, verifyEmail } = useContext(AuthContext);
-  const handleOnSubmit = event => {
-    event.preventDefault();
-    const name = event.target.name.value;
-    const image = event.target.image.files[0];
-    const email = event.target.email.value;
-    const password = event.target.password.value;
-    console.log(name, image, email);
-    const formData = new FormData();
-    // bc096070e01c8b84a025addedea5822b API KEY
+  const {
+    createUser,
+    updateUserProfile,
+    verifyEmail,
+    loading,
+    setLoading,
+    signInWithGoogle,
+  } = useContext(AuthContext)
+
+  const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from?.pathname || '/'
+
+  const handleSubmit = event => {
+    event.preventDefault()
+    const name = event.target.name.value
+
+    const email = event.target.email.value
+    const password = event.target.password.value
+
+    // Image Upload
+    const image = event.target.image.files[0]
+    const formData = new FormData()
     formData.append('image', image)
-    const url =
-      'https://api.imgbb.com/1/upload?key=bc096070e01c8b84a025addedea5822b'
+    // imagebb key dd0787eff9df2283cfe938d03b3fbcfa
+    //https://api.imgbb.com/1/upload
+    const url = `https://api.imgbb.com/1/upload?key=dd0787eff9df2283cfe938d03b3fbcfa`
 
     fetch(url, {
-      method: "POST",
+      method: 'POST',
       body: formData,
     })
       .then(res => res.json())
-      .then(imageData => createUser(email, password)
-        .then(result => {
-          updateUserProfile(name, imageData.data.display_url)
-            .then(
-              verifyEmail().then(() => {
-                toast.success("Please check your email verification link")
-              })
-                .catch(err => console.log(err))
-            )
-            .catch(err => console.log(err))
-        }))
+      .then(imageData => {
+        // Create User
+        createUser(email, password)
+          .then(result => {
+            setAuthToken(result.user)
+            updateUserProfile(name, imageData.data.display_url)
+              .then(
+                verifyEmail().then(() => {
+                  toast.success(
+                    'Please check your email for verification link.'
+                  )
+                  navigate(from, { replace: true })
+                })
+              )
+              .catch(err => console.log(err))
+          })
+
+          .catch(err => {
+            console.log(err)
+            setLoading(false)
+          })
+      })
       .catch(err => console.log(err))
   }
+
+  const handleGoogleSignin = () => {
+    signInWithGoogle().then(result => {
+      console.log(result.user)
+      setAuthToken(result.user)
+      navigate(from, { replace: true })
+    })
+  }
+
   return (
     <div className='flex justify-center items-center pt-8'>
       <div className='flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900'>
@@ -48,7 +81,7 @@ const Signup = () => {
           <p className='text-sm text-gray-400'>Create a new account</p>
         </div>
         <form
-          onSubmit={handleOnSubmit}
+          onSubmit={handleSubmit}
           noValidate=''
           action=''
           className='space-y-12 ng-untouched ng-pristine ng-valid'
@@ -62,7 +95,6 @@ const Signup = () => {
                 type='text'
                 name='name'
                 id='name'
-                required
                 placeholder='Enter Your Name Here'
                 className='w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-green-500 bg-gray-200 text-gray-900'
                 data-temp-mail-org='0'
@@ -73,11 +105,11 @@ const Signup = () => {
                 Select Image:
               </label>
               <input
+                required
                 type='file'
                 id='image'
                 name='image'
                 accept='image/*'
-                required
               />
             </div>
             <div>
@@ -101,10 +133,10 @@ const Signup = () => {
                 </label>
               </div>
               <input
+                required
                 type='password'
                 name='password'
                 id='password'
-                required
                 placeholder='*******'
                 className='w-full px-3 py-2 border rounded-md border-gray-300 bg-gray-200 focus:outline-green-500 text-gray-900'
               />
@@ -116,7 +148,7 @@ const Signup = () => {
                 type='submit'
                 classes='w-full px-8 py-3 font-semibold rounded-md bg-gray-900 hover:bg-gray-700 hover:text-white text-gray-100'
               >
-                Sign up
+                {loading ? <SmallSpinner /> : 'Sign Up'}
               </PrimaryButton>
             </div>
           </div>
@@ -129,7 +161,11 @@ const Signup = () => {
           <div className='flex-1 h-px sm:w-16 dark:bg-gray-700'></div>
         </div>
         <div className='flex justify-center space-x-4'>
-          <button aria-label='Log in with Google' className='p-3 rounded-sm'>
+          <button
+            onClick={handleGoogleSignin}
+            aria-label='Log in with Google'
+            className='p-3 rounded-sm'
+          >
             <svg
               xmlns='http://www.w3.org/2000/svg'
               viewBox='0 0 32 32'

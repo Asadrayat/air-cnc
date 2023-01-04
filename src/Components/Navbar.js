@@ -3,7 +3,6 @@ import { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import PrimaryButton from '../Components/Button/PrimaryButton'
 import { AuthContext } from './contexts/AuthProvider'
-
 const Navbar = () => {
   const { user, logout  } = useContext(AuthContext)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
