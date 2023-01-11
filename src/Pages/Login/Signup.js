@@ -3,8 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import PrimaryButton from '../../Components/Button/PrimaryButton'
 import toast from 'react-hot-toast'
 import SmallSpinner from '../../Components/Spinner/SmallSpinner'
-import { setAuthToken } from '../../api/auth'
 import { AuthContext } from '../../Components/contexts/AuthProvider'
+import { setAuthToken } from '../../api/auth'
 
 const Signup = () => {
   const {

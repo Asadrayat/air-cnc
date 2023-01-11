@@ -1,10 +1,10 @@
-import React, { useContext, useState } from 'react'
-import toast from 'react-hot-toast'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import PrimaryButton from '../../Components/Button/PrimaryButton'
-import SmallSpinner from '../../Components/Spinner/SmallSpinner'
-import { setAuthToken } from '../../api/auth'
-import { AuthContext } from '../../Components/contexts/AuthProvider'
+import { useContext, useState } from "react"
+import { toast } from "react-hot-toast"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { setAuthToken } from "../../api/auth"
+import PrimaryButton from "../../Components/Button/PrimaryButton"
+import { AuthContext } from "../../Components/contexts/AuthProvider"
+import SmallSpinner from "../../Components/Spinner/SmallSpinner"
 
 const Login = () => {
   const [userEmail, setUserEmail] = useState('')

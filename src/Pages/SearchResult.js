@@ -1,6 +1,5 @@
-import React from 'react'
-import { useLocation } from 'react-router-dom'
-import SearchCard from '../Components/Card/SearchCard'
+import { useLocation } from "react-router-dom"
+import SearchCard from "../Components/Card/SearchCard"
 
 const SearchResult = () => {
   const { state } = useLocation()
